@@ -15,9 +15,10 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from auctionApp.views import LotListView
+from auctionApp import views
 
 urlpatterns = [
+    url(r'^$', views.index, name='index'),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^lots/', LotListView.as_view())
+    url(r'^auction/', include('auctionApp.urls'))
 ]
