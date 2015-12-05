@@ -51,7 +51,7 @@ def index(request):
     lot_list = search_lots(request)
 
     for lot in lot_list:
-        if lot.expires > timezone.now():
+        if lot.expires <= timezone.now() or lot.current_bid().price > lot.buyoff_price:
             lot.bought = True
             lot.save()
 
@@ -109,14 +109,15 @@ def logout_action(request):
     return redirect('index')
 
 def create_lot(request):
-    trader = Trader.objects.get(pk = request.POST['trader_id'])
-    lot = Lot.objects.create(
-        trader=trader,
-        name=request.POST['name'],
-        buyoff_price=request.POST['buyoff_price'],
-        starting_bid=request.POST['starting_bid'],
-        expires=request.POST['expires'])
-    lot.save()
+    if request.POST['buyoff_price'] > request.POST['starting_bid']:
+        trader = Trader.objects.get(pk=request.POST['trader_id'])
+        lot = Lot.objects.create(
+            trader=trader,
+            name=request.POST['name'],
+            buyoff_price=request.POST['buyoff_price'],
+            starting_bid=request.POST['starting_bid'],
+            expires=request.POST['expires'])
+        lot.save()
     return redirect('index')
 
 def change_lot(request):

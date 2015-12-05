@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Trader(models.Model):
@@ -29,7 +30,13 @@ class Lot(models.Model):
         return self.name
 
     def current_bid(self):
-        return Bid.objects.filter(lot__pk = self.pk).latest(field_name='date')
+        try:
+            bid = Bid.objects.filter(lot__pk=self.pk).latest(field_name='date')
+        except Bid.DoesNotExist:
+            buyer = Buyer.objects.get(pk=1)
+            bid = Bid.objects.create(lot=self, buyer=buyer, price=self.starting_bid, date=timezone.now())
+            bid.save()
+        return bid
 
 
 class Bid(models.Model):
