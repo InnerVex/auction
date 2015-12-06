@@ -1,0 +1,262 @@
+{% extends 'auctionApp/base.html' %}
+
+{% block title %}
+    <title>Auction -- Main Page</title>
+{% endblock %}
+
+{% block content %}
+
+    <div class="page-header text-center col-md-12">
+        <p>This is the main page. There you authenticate, create lots (if you're a Trader) or make bids and buy lots (if you're a Buyer).</p>
+        <p>If a bid was made, the Trader should contact the Buyer to insure his creditability.</p>
+        <p>Get all the details covered by yourself like an adult, won't you?</p>
+        <hr>
+        {% if user %}
+            <div class="form-group col-md-12">
+                <div class="form-group col-md-3">
+                    Welcome, {{ user }} {{ user.last_name }}
+                </div>
+                <div class="form-group col-md-2">
+                    <a href="{% url 'logout' %}">Logout</a>
+                </div>
+            </div>
+        {% else %}
+            <form action="{% url 'login' %}" method="post">{% csrf_token %}
+                <div class="form-group col-md-12">
+                    <label for="username" style="width: 70px; float: left">Username</label>
+                    <div class="col-md-2">
+                        <input class="form-control" type="text" name="username" id="username" />
+                    </div>
+
+                    <label for="password" style="width: 70px; float: left">Password</label>
+                    <div class="col-md-2">
+                        <input class="form-control" type="password" name="password" id="password" />
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <button class="btn btn-info" type="submit">Login</button>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <a href="{% url 'registration' %}">Registration</a>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+
+
+    <div class="col-md-12">
+        <legend>Lot Search</legend>
+        <form action="" method="post">{% csrf_token %}
+
+            <div class="form-group col-md-10">
+                <input class="form-control" type="text" name="search_name" id="search_name" value="{{ post.search_name }}"/>
+            </div>
+
+            <div class="form-group col-md-2">
+                <button class="btn btn-info" type="submit">Search lots</button>
+            </div>
+
+            {% if trader %}
+                <input type="hidden" name="trader_id" id="trader_id" value="{{ trader.pk }}"/>
+                <div class="form-group col-md-12">
+                    <div class="col-md-1">
+                        <input class="form-control" type="checkbox" name="own" id="own" />
+                    </div>
+                    <label for="own" class="col-md-11">Show my own lots</label>
+                </div>
+            {% endif %}
+        </form>
+
+
+        {% if trader %}
+            <legend>Lot Creation</legend>
+
+            <form class="create_form" action="{% url 'create_lot' %}" method="post">{% csrf_token %}
+                <input type="hidden" name="trader_id" id="trader_id" value="{{ trader.pk }}"/>
+
+                <div class="form-group col-md-12">
+                    <label for="name" class="col-md-2">Title</label>
+                    <div class="col-md-10">
+                        <input class="form-control" type="text" name="name" id="name" />
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12">
+                    <label for="starting_bid" class="col-md-2">Starting Bid</label>
+                    <div class="col-md-3">
+                        <input class="form-control" type="text" name="starting_bid" id="starting_bid" />
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12">
+                    <label for="buyoff_price" class="col-md-2">Buyoff Price</label>
+                    <div class="col-md-3">
+                        <input class="form-control" type="text" name="buyoff_price" id="buyoff_price" />
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12">
+                    <label for="expires" class="col-md-2">Expires</label>
+                    <div class='input-group date col-md-4 datetimepicker'>
+                        <input type='text' class="form-control" name="expires" id="expires" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <button class="btn btn-info" type="submit">Create lot</button>
+                </div>
+            </form>
+        {% endif %}
+
+
+        <legend>Lot List</legend>
+        {% if lot_list %}
+            {% for lot in lot_list %}
+                <div class="well col-md-12">
+                    <p>{{ lot.name }}</p>
+                    <p><b>Lot expires: </b> {{ lot.expires }}</p>
+                    <p><b>Starting bid: </b> {{ lot.starting_bid }}</p>
+                    <p><b>Latest bid: </b> {{ lot.current_bid }}</p>
+                    <p><b>Buyoff price: </b> {{ lot.buyoff_price }}</p>
+
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lot{{ lot.pk }}">
+                        Trader info
+                    </button>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="lot{{ lot.pk }}" tabindex="-1" role="dialog" aria-labelledby="lotLabel{{ lot.pk }}">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="lotLabel{{ lot.pk }}">Trader info</h4>
+                          </div>
+                          <div class="modal-body">
+                              <p>{{ lot.trader.information }}</p>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+
+                    {% if lot.bought %}
+                        <p><b>Lot is buyed off :)</b></p>
+                    {% else %}
+                        {% if buyer %}
+                            <div class="form-group col-md-12">
+                                <div class="col-md-3">
+                                   <form class="bid_form" action="{% url 'make_bid' %}" method="post">{% csrf_token %}
+                                        <input type="hidden" name="buyer_id" id="buyer_id" value="{{ buyer.pk }}"/>
+                                        <input type="hidden" name="lot_id" id="lot_id" value="{{ lot.pk }}"/>
+                                        <div class="form-group col-md-12">
+                                            <div class="col-md-6">
+                                                <input class="form-control" type="text" name="price" id="price" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <button class="btn btn-info" type="submit">Make bid</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-md-2">
+                                    <form action="{% url 'buy_off' %}" method="post">{% csrf_token %}
+                                        <input type="hidden" name="buyer_id" id="buyer_id" value="{{ buyer.pk }}"/>
+                                        <input type="hidden" name="lot_id" id="lot_id" value="{{ lot.pk }}"/>
+                                        <div class="form-group col-md-12">
+                                            <button class="btn btn-info" type="submit">Buy off</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if trader %}
+                            <div class="form-group col-md-12">
+                                <!-- Button trigger modal -->
+                                {% if lot.trader.pk == trader.pk %}
+                                    <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#lot_change{{ lot.pk }}">
+                                        Change lot
+                                    </button>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="lot_change{{ lot.pk }}" tabindex="-1" role="dialog" aria-labelledby="lot_changeLabel{{ lot.pk }}">
+                                      <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="lot_changeLabel{{ lot.pk }}">Lot changing</h4>
+                                          </div>
+                                          <div class="modal-body col-md-12">
+                                                <form class="change_form" action="{% url 'change_lot' %}" method="post">{% csrf_token %}
+                                                    <input type="hidden" name="lot_id" id="lot_id" value="{{ lot.pk }}"/>
+
+                                                    <div class="form-group col-md-12">
+                                                        <label for="name" class="col-md-2">Title</label>
+                                                        <div class="col-md-10">
+                                                            <input class="form-control" type="text" name="name" id="name" value="{{ lot.name }}"/>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group col-md-12">
+                                                        <label for="starting_bid" class="col-md-2">Starting Bid</label>
+                                                        <div class="col-md-3">
+                                                            <input class="form-control" type="text" name="starting_bid" id="starting_bid" value="{{ lot.starting_bid }}"/>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group col-md-12">
+                                                        <label for="buyoff_price" class="col-md-2">Buyoff Price</label>
+                                                        <div class="col-md-3">
+                                                            <input class="form-control" type="text" name="buyoff_price" id="buyoff_price" value="{{ lot.buyoff_price }}"/>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group col-md-12">
+                                                        <label for="expires" class="col-md-2">Expires</label>
+                                                        <div class='input-group date col-md-4 datetimepicker'>
+                                                            <input type='text' class="form-control" name="expires" id="expires" value="{{ lot.expires }}"/>
+                                                            <span class="input-group-addon">
+                                                                <span class="glyphicon glyphicon-calendar"></span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group col-md-2">
+                                                        <button class="btn btn-info" type="submit">Change lot</button>
+                                                    </div>
+                                                </form>
+                                          </div>
+                                          <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                    {% if trader %}
+                        {% if lot.trader.pk == trader.pk %}
+                            <form action="{% url 'delete_lot' %}" method="post">{% csrf_token %}
+                                <input type="hidden" name="lot_id" id="lot_id" value="{{ lot.pk }}"/>
+                                <div class="form-group col-md-12">
+                                    <button class="btn btn-danger" type="submit">Delete lot</button>
+                                </div>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+{% endblock %}
