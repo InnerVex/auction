@@ -3,6 +3,6 @@ python: "3.5"
 env:
  - DJANGO=1.8.5
 install:
- - pip install -q Django==$DJANGO --use-mirrors
- - pip install -q -e . --use-mirrors
+ - pip install -q Django==$DJANGO
+ - pip install -q -e .
 script: «python manage.py test»
