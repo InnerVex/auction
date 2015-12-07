@@ -23,7 +23,7 @@ class Lot(models.Model):
     name = models.CharField(max_length=80)
     starting_bid = models.FloatField(default=0)
     buyoff_price = models.FloatField(default=0)
-    expires = models.DateTimeField('the day the bidding ends')
+    expires = models.DateTimeField('the day the bidding ends', default=timezone.now())
     bought = models.BooleanField(default=False)
 
     def __str__(self):
@@ -43,7 +43,7 @@ class Bid(models.Model):
     lot = models.ForeignKey(Lot)
     buyer = models.ForeignKey(Buyer)
     price = models.FloatField(default=0)
-    date = models.DateTimeField('the day the bid was made')
+    date = models.DateTimeField('the day the bid was made', default=timezone.now())
 
     def __str__(self):
         return '{} wants to buy {} for {}'.format(self.buyer, self.lot, self.price)
