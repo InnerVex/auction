@@ -1,5 +1,5 @@
 language: python
-python: "2.7"
+python: "3.5"
 env:
  - DJANGO=1.8.5
 install:
@@ -9,4 +9,5 @@ install:
  - python ez_setup.py
  - pip install Django==$DJANGO
  - pip install .
-script: «python manage.py test»
+script: 
+ -python manage.py test
