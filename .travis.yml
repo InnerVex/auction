@@ -2,6 +2,8 @@ language: python
 python: "3.5"
 env:
  - DJANGO=1.8.5
+services:
+ - mysql
 install:
  - curl https://bootstrap.pypa.io/get-pip.py -o - | python
  - pip install -U pip
