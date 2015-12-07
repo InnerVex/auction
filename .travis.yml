@@ -3,7 +3,9 @@ python: "2.7"
 env:
  - DJANGO=1.8.5
 install:
- - pip install -q Django==$DJANGO
+ - pip install --upgrade pip
  - pip install --upgrade setuptools
- - pip install -q .
+ - python ez_setup.py
+ - pip install Django==$DJANGO
+ - pip install .
 script: «python manage.py test»
