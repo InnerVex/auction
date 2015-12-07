@@ -10,4 +10,7 @@ install:
  - pip install Django==$DJANGO
  - pip install .
 script: 
+ python manage.py makemigrations
+ python manage.py migrate
+ python manage.py collectstatic
  python manage.py test
