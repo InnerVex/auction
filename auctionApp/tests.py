@@ -8,7 +8,7 @@ from django.test.client import RequestFactory
 from unittest.mock import patch
 
 
-class Test(TestCase):
+class TestDefs(TestCase):
 
     def setUp(self):
         # Every test needs access to the request factory.
@@ -21,7 +21,7 @@ class Test(TestCase):
             request = self.factory.get('/')
             request.POST._mutable = True
             request.POST['search_name'] = 'picture'
-            request.POST['trader_id'] = 0
+            request.POST['trader_id'] = 1
             request.POST['own'] = 'on'
 
             user1 = User.objects.create_user('user1', 'user1@user.ru', 'user1')
@@ -33,7 +33,7 @@ class Test(TestCase):
 
             self.assertListEqual(
                 list(search_lots(request)),
-                list(Lot.objects.filter(name__icontains='picture').filter(trader__pk=0).order_by('-expires')))
+                list(Lot.objects.filter(name__icontains='picture').filter(trader__pk=1).order_by('-expires')))
 
     def test_is_user_logged(self):
         request = self.factory.get('/')
@@ -64,5 +64,3 @@ class Test(TestCase):
         lot_to_check = Lot.objects.get(pk=request.POST['lot_id'])
 
         self.assertEqual(lot_to_check.name, 'NEW NAME')
-
-
