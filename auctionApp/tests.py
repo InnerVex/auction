@@ -24,12 +24,8 @@ class Test(TestCase):
             request.POST['trader_id'] = 0
             request.POST['own'] = 'on'
 
-            user1 = User.objects.create_user('user1', 'user1@user.ru', 'user1')
-            user2 = User.objects.create_user('user2', 'user2@user.ru', 'user2')
-            trader1 = Trader.objects.create(user=user1, information='hello1')
-            trader2 = Trader.objects.create(user=user2, information='hello2')
-            Lot.objects.create(expires=timezone.now(), name='picture creator', trader=trader1)
-            Lot.objects.create(expires=timezone.now(), name='picture destroyer', trader=trader2)
+            Lot.objects.create(expires=timezone.now(), name='picture creator')
+            Lot.objects.create(expires=timezone.now(), name='picture destroyer')
 
             self.assertListEqual(
                 list(search_lots(request)),
@@ -40,10 +36,8 @@ class Test(TestCase):
         self.assertFalse(is_user_logged(request))
 
     def test_show_info(self):
-        user1 = User.objects.create_user('user1', 'user1@user.ru', 'user1')
-        user2 = User.objects.create_user('user2', 'user2@user.ru', 'user2')
-        Trader.objects.create(user=user1, information='oh uh')
-        Trader.objects.create(user=user2, information='hello, it is the RIGHT one')
+        Trader.objects.create(information='oh uh')
+        Trader.objects.create(information='hello, it is the RIGHT one')
 
         self.assertEqual(show_info(2), 'hello, it is the RIGHT one')
 

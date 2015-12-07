@@ -152,7 +152,7 @@
                     {% else %}
                         {% if buyer %}
                             <div class="form-group col-md-12">
-                                <div class="col-md-3">
+                                <div class="col-md-7">
                                    <form class="bid_form" action="{% url 'make_bid' %}" method="post">{% csrf_token %}
                                         <input type="hidden" name="buyer_id" id="buyer_id" value="{{ buyer.pk }}"/>
                                         <input type="hidden" name="lot_id" id="lot_id" value="{{ lot.pk }}"/>
