@@ -4,6 +4,7 @@ env:
  - DJANGO=1.8.5
 install:
  - pip install Django==$DJANGO
+ - pip install flake8
 script:
- - python flake8 .
+ - flake8 .
  - python manage.py test
