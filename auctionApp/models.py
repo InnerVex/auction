@@ -4,7 +4,7 @@ from django.utils import timezone
 
 
 class Trader(models.Model):
-    user = models.ForeignKey(User, default=User.objects.create_user('delete_me', 'delete_me@delete_me.ru', 'delete_me'))
+    user = models.ForeignKey(User, default=User.objects.create_user(timezone.now().__str__()+'delete_me', timezone.now().__str__()+'delete_me@delete_me.ru', 'delete_me'))
     information = models.TextField(blank=True)
 
     def __str__(self):
@@ -12,7 +12,7 @@ class Trader(models.Model):
 
 
 class Buyer(models.Model):
-    user = models.ForeignKey(User, default=User.objects.create_user('delete_me', 'delete_me@delete_me.ru', 'delete_me'))
+    user = models.ForeignKey(User, default=User.objects.create_user(timezone.now().__str__()+'delete_me', timezone.now().__str__()+'delete_me@delete_me.ru', 'delete_me'))
 
     def __str__(self):
         return str(self.user)
