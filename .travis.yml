@@ -2,18 +2,7 @@ language: python
 python: "3.5"
 env:
  - DJANGO=1.8.5
-services:
- - mysql
 install:
- - curl https://bootstrap.pypa.io/get-pip.py -o - | python
- - pip install -U pip
- - pip install --upgrade setuptools
- - python ez_setup.py
  - pip install Django==$DJANGO
- - pip install .
-script: 
- - python manage.py flush
- - python manage.py makemigrations
- - python manage.py migrate
- - python manage.py collectstatic
+script:
  - python manage.py test
