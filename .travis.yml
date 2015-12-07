@@ -4,5 +4,6 @@ env:
  - DJANGO=1.8.5
 install:
  - pip install -q Django==$DJANGO
+ - pip install --upgrade setuptools
  - pip install -q .
 script: «python manage.py test»
