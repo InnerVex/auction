@@ -3,7 +3,8 @@ python: "2.7"
 env:
  - DJANGO=1.8.5
 install:
- - pip install --upgrade pip
+ - curl https://bootstrap.pypa.io/get-pip.py -o - | python
+ - pip install -U pip
  - pip install --upgrade setuptools
  - python ez_setup.py
  - pip install Django==$DJANGO
