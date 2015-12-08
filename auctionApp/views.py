@@ -8,26 +8,28 @@ from functools import reduce
 import operator
 
 
-#Вспомогательные функции для тестов
+# Вспомогательные функции для тестов
 def search_lots(request):
     post = request.POST
     predicates = []
     if 'search_name' in post:
-        predicates.append(Q(name__icontains = post['search_name']))
+        predicates.append(Q(name__icontains=post['search_name']))
     if 'own' in post:
         if post['own'] == 'on' and is_user_logged(request):
-            predicates.append(Q(trader__id = post['trader_id']))
+            predicates.append(Q(trader__id=post['trader_id']))
 
-    if predicates != [] :
+    if predicates:
         lot_list = Lot.objects.filter(reduce(operator.and_, predicates)).order_by('-expires')
     else:
         lot_list = Lot.objects.order_by('-expires')
 
     return lot_list
 
+
 def show_info(trader_pk):
-    trader = Trader.objects.get(pk = trader_pk)
+    trader = Trader.objects.get(pk=trader_pk)
     return trader.information
+
 
 def is_user_logged(request):
     if hasattr(request, 'user'):
@@ -38,6 +40,7 @@ def is_user_logged(request):
     else:
         return False
 
+
 def change_lot_inner(request):
     lot = Lot.objects.get(pk=request.POST['lot_id'])
     lot.name = request.POST['name']
@@ -46,7 +49,9 @@ def change_lot_inner(request):
     lot.expires = request.POST['expires']
     lot.save()
 
-#Actions
+
+# Actions
+
 def index(request):
     lot_list = search_lots(request)
 
@@ -55,15 +60,17 @@ def index(request):
             lot.bought = True
             lot.save()
 
-    user = None; trader = None; buyer = None
+    user = None
+    trader = None
+    buyer = None
     if request.user.is_authenticated():
         user = request.user
         try:
-            trader = Trader.objects.get(user__pk = user.pk)
+            trader = Trader.objects.get(user__pk=user.pk)
         except Trader.DoesNotExist:
             trader = None
         try:
-            buyer = Buyer.objects.get(user__pk = user.pk)
+            buyer = Buyer.objects.get(user__pk=user.pk)
         except Buyer.DoesNotExist:
             buyer = None
     context = {
@@ -75,8 +82,10 @@ def index(request):
 
     return render(request, 'auctionApp/index.html', context)
 
+
 def registration(request):
     return render(request, 'auctionApp/registration.html')
+
 
 def register(request):
     username = request.POST['username']
@@ -97,6 +106,7 @@ def register(request):
 
     return redirect('index')
 
+
 def login_action(request):
     username = request.POST['username']
     password = request.POST['password']
@@ -104,9 +114,11 @@ def login_action(request):
     login(request, user)
     return redirect('index')
 
+
 def logout_action(request):
     logout(request)
     return redirect('index')
+
 
 def create_lot(request):
     if request.POST['buyoff_price'] > request.POST['starting_bid']:
@@ -120,14 +132,17 @@ def create_lot(request):
         lot.save()
     return redirect('index')
 
+
 def change_lot(request):
     change_lot_inner(request)
     return redirect('index')
+
 
 def delete_lot(request):
     lot = Lot.objects.get(pk=request.POST['lot_id'])
     lot.delete()
     return redirect('index')
+
 
 def make_bid(request):
     lot = Lot.objects.get(pk=request.POST['lot_id'])
@@ -136,14 +151,15 @@ def make_bid(request):
     better_bid = False
     try:
         cur_bid = lot.current_bid()
-        if(price > cur_bid.price):
+        if price > cur_bid.price:
             better_bid = True
     except Bid.DoesNotExist:
         better_bid = True
-    if better_bid and price > lot.starting_bid and price < lot.buyoff_price:
+    if better_bid and lot.starting_bid < price < lot.buyoff_price:
         bid = Bid.objects.create(lot=lot, buyer=buyer, price=price, date=timezone.now())
         bid.save()
     return redirect('index')
+
 
 def buy_off(request):
     lot = Lot.objects.get(pk=request.POST['lot_id'])

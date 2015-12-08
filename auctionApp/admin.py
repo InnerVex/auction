@@ -10,21 +10,25 @@ class BidInline(admin.TabularInline):
     model = Bid
     extra = 1
 
+
 class LotInline(admin.TabularInline):
     model = Lot
     extra = 1
 
+
 class LotAdmin(admin.ModelAdmin):
     fieldsets = (
-        (None, {'fields' : ['name', 'trader']}),
-        ('Bidding', {'fields' : ['starting_bid', 'buyoff_price', 'expires', 'bought']})
+        (None, {'fields': ['name', 'trader']}),
+        ('Bidding', {'fields': ['starting_bid', 'buyoff_price', 'expires', 'bought']})
     )
     list_display = ('name', 'expires')
     search_fields = ['name']
     inlines = [BidInline]
 
+
 class BuyerAdmin(admin.ModelAdmin):
     inlines = [BidInline]
+
 
 class TraderAdmin(admin.ModelAdmin):
     inlines = [LotInline]
